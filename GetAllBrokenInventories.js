@@ -8,6 +8,7 @@
 
 (function() {
     'use strict';
+
     const useFallbackIDs = false;
     const skipInventorySearch = false;
     const debugOnly = false;
@@ -27,11 +28,14 @@
         const bodyText = document.body.innerText;
         let match;
         const appIDs = new Set();
+
         while ((match = appIDPattern.exec(bodyText)) !== null) {
             appIDs.add(match[1]);
         }
+
         return Array.from(appIDs);
     }
+
     function createBuyOrders(appIDs) {
         appIDs.forEach(appID => {
             $J.post('https://steamcommunity.com/market/createbuyorder/', {
@@ -48,6 +52,7 @@
             });
         });
     }
+
     function getBrokenInventories() {
         const errormsg_list = () => log('warning', "No updated list was found, using the default list provided in the script");
         if (!useFallbackIDs) {
@@ -79,6 +84,7 @@
             });
         } else getInventory();
     }
+
     const getInventory = () => {
         const errormsg_inventory = () => log("bad", "Script aborted: Could not load your inventory. Please make sure you are logged in and set skipInventorySearch to true if necessary.");
         if (!skipInventorySearch) {
@@ -119,7 +125,7 @@
                                     log('good', 'The following apps are listed as broken but do not appear to be:');
                                     log('', notBroken);
                                 }
-                                appIds = appIds.filter(id => !cache.hasOwnProperty(id))
+                                appIds = appIds.filter(id => !cache.hasOwnProperty(id)) //filter values
                                 buyAll(appIds);
                             } else {
                                 errormsg_inventory();
@@ -154,6 +160,7 @@
             }
         }
     };
+
     const buy = (appId) => {
         return new Promise((resolve, reject) => {
             $J.post("https://steamcommunity.com/market/createbuyorder/", {
@@ -172,6 +179,7 @@
             });
         });
     };
+
     const log = (extra, text) => {
         const Style = {
             base: [
@@ -197,6 +205,7 @@
         style += Style[extra] ? Style[extra].join(';') : '';
         console.log(`%c${new Date().toLocaleTimeString()} - ${text}`, style);
     }
+
     function addButton() {
         const button = document.createElement('button');
         button.innerText = 'Run Broken Tabs Manager';
@@ -210,6 +219,7 @@
         button.style.border = 'none';
         button.style.borderRadius = '5px';
         button.style.cursor = 'pointer';
+
         button.addEventListener('click', () => {
             const appIDs = JSON.parse(localStorage.getItem('steamAppIDs') || '[]');
             if (appIDs.length > 0) {
@@ -218,8 +228,10 @@
                 console.log('No appIDs found in local storage.');
             }
         });
+
         document.body.appendChild(button);
     }
+
     window.addEventListener('load', () => {
         const url = window.location.href;
         if (url.includes("groups/InventoryService/discussions/0/1711816348630251347")) {
